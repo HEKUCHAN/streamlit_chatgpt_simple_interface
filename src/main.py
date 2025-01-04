@@ -17,19 +17,27 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("送信するメッセージを入力"):
-    st.session_state["messages"].append({"role": "user", "content": prompt})
+if user_message := st.chat_input("送信するメッセージを入力"):
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.markdown(user_message)
 
-    response = client.chat.completions.create(
-        messages=st.session_state["messages"],
-        model=settings.openai_model,
-    )
-
-    assistant_message = response.choices[0].message.content
-    st.session_state["messages"].append(
-        {"role": "assistant", "content": assistant_message}
-    )
     with st.chat_message("assistant"):
-        st.markdown(assistant_message)
+        st.session_state.messages.append({"role": "user", "content": user_message})
+        message_placeholder = st.empty()
+        message_placeholder.markdown("AIが考え中...")
+
+        full_response = ""
+
+        stream = client.chat.completions.create(
+            messages=st.session_state["messages"],
+            model=settings.openai_model,
+            stream=True,
+        )
+
+        for chunk in stream:
+            full_response += chunk.choices[0].delta.content or ""
+            message_placeholder.markdown(full_response)
+
+    st.session_state["messages"].append(
+        {"role": "assistant", "content": full_response}
+    )
