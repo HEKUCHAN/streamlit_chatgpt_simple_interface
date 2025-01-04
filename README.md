@@ -7,3 +7,7 @@ An simple interface for chatgpt
 poetry install
 ```
 
+# Run
+```bash
+streamlit run src/main.py
+```
