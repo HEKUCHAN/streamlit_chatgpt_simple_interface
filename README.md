@@ -7,6 +7,12 @@ An simple interface for chatgpt
 poetry install
 ```
 
+# Environments
+Add your OpenAI API key to the .env file
+```bash
+cp .env.example .env
+```
+
 # Run
 ```bash
 streamlit run src/main.py
